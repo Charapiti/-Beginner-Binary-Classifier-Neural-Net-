@@ -1,5 +1,7 @@
 import numpy as np
 
+# sqrt(2/n) n is input node amount
+
 def main():
     Structure = [8,5,5,5,1]
 
@@ -10,35 +12,23 @@ def main():
     weights_array = [] # list of 9*8, 9*9, ..., 9*1 matrices
     biases_array = [] # list of 9*1, 9*1, ..., 1*1 matrices
     fill_weights_and_biases(Structure, weights_array, biases_array)
+    Pre_activations_array = [] # list of 9*1, 9*1, ..., 1*1 matrices
+    Post_activations_array = [] # list of 9*1, 9*1, ..., 1*1 matrices
     Outputs_array = [] # x*1 matrix
-    print(weights_array)
-
-    Neural_Net = np.array(intialize_Nueral_net(hidden_Layers_Amount, hidden_Layer_Node_Amount)) 
-
-    # print("Weights array length: ", len(weights_array))
-    # print("Biases array length: ", len(biases_array))
-    # print("Neural net shape: ", Neural_Net.shape)
     
     trial_data = np.array([[107, 6.61, 6.28, 8, 0, 8, 8, 4]])
-    # print("Trial data shape: ", trial_data.shape)
-    
     transposed_data = trial_data.T
-    # print("Transposed data shape: ", transposed_data.shape)
     
-    feedfoward_output = feedfoward(transposed_data, weights_array, biases_array, Neural_Net)
-    # print("Feedfoward output shape: ", feedfoward_output.shape)
-    # print("Feedfoward output: ", feedfoward_output)
-
+    feedfoward_output = feedfoward(transposed_data, weights_array, biases_array, Pre_activations_array, Post_activations_array)
     trial_data_output = np.array([0])
-    print("\n", Neural_Net)
     
-    
+
     # cost_value = average_cost(feedfoward_output, trial_data_output_reshaped)
     # print("Average Cost value: ", cost_value)
 
-    gradiant_w = np.array([]) 
-    gradiant_b = np.array([]) 
-    # backpropagation(gradiants_b, gradiants_w, biases_array, weights_array, cost_value)
+    gradiant_w = [0] * len(weights_array)
+    gradiant_b =  [0] * len(biases_array)   
+    backpropagation(Pre_activations_array, Post_activations_array, weights_array, biases_array, gradiant_w, gradiant_b, feedfoward_output, trial_data_output)
     
 
 # initializes neural net nodes to 0 and returns a list
@@ -62,22 +52,20 @@ def fill_weights_and_biases(Layer_Node_Amounts, weights_array, biases_array):
         weights_array.append(weights)
         biases_array.append(biases)
 
-        print("Weights shape: ", weights.shape)
-        print("Biases shape: ", biases.shape)
+        
  
  # feeds the input data through the neural network 
-def feedfoward(input_data, weights_array, biases_array, Neural_Net):  
+def feedfoward(input_data, weights_array, biases_array, Pre_activations_array, Post_activations_array):
     output = input_data
-    print (Neural_Net[0])
 
-    for i in range(len(weights_array) - 1):
-        output = sigmoid(np.dot(weights_array[i], output) + biases_array[i])
-        print("\nLayer ", i, " output shape: ", output.shape)
-        Neural_Net[i] = output.T[0]
-    
-    output = sigmoid(np.dot(weights_array[-1], output) + biases_array[-1])
+    for i in range(len(weights_array)):
+        Pre_activations_output = np.dot(weights_array[i], output) + biases_array[i]
+        Pre_activations_array.append(Pre_activations_output)
+
+        output = sigmoid(Pre_activations_output)
+        Post_activations_array.append(output)
+
     print("\n Final output: ", output[0][0])
-
     return output
 
 # activation function that maps any real-valued number into the (0, 1) interval
@@ -102,14 +90,17 @@ def Loss_function(output, actual):
 def Loss_derivative(output, actual):
     return (-actual / output) + ((1 - actual) / (1 - output))
 
-def backpropagation(hidden_layers, Weights, Biases, Weights_gradients, Biases_gradients, outputs, actuals): # NOTE: Need to finish
-    temp_Weights = Weights.T
-    tnmp_biases = Biases.T
+def backpropagation(pre_activations,post_activations, Weights, Biases, Weights_gradients, Biases_gradients, outputs, actuals): # NOTE: Need to finish
     
-    reusable_math = sigmoid_derivative(outputs) * Loss_derivative(outputs, actuals)
+    reusable_math = sigmoid_derivative(pre_activations) * Loss_derivative(outputs, actuals)
 
-    for i in range(len(temp_Weights)-1, -1, -1):
-        Weights_gradients
+    for i in range(len(Biases)-1, -1, -1):
+        temp_weight_matrix = ((Weights[i] * 0) + 1)
+        temp_bias_matrix = ((Biases[i] * 0) + 1)
+        print("\n Temp matrix: ", temp_weight_matrix)
+
+        
+
 
     
     pass
