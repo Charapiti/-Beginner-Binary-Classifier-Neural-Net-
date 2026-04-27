@@ -29,6 +29,15 @@ def main():
     gradiant_w = [0] * len(weights_array)
     gradiant_b =  [0] * len(biases_array)   
     backpropagation(Pre_activations_array, Post_activations_array, weights_array, biases_array, gradiant_w, gradiant_b, feedfoward_output, trial_data_output)
+    update_weights_and_biases(weights_array, biases_array, gradiant_w, gradiant_b, Learning_Rate)
+    
+
+def update_weights_and_biases(weights_array, biases_array, gradiant_w, gradiant_b, learning_rate):
+    for i in range(len(weights_array)):
+        weights_array[i] -= learning_rate * gradiant_w[i]
+        biases_array[i] -= learning_rate * gradiant_b[i]
+
+    
     
 
 # initializes neural net nodes to 0 and returns a list
@@ -57,6 +66,7 @@ def fill_weights_and_biases(Layer_Node_Amounts, weights_array, biases_array):
  # feeds the input data through the neural network 
 def feedfoward(input_data, weights_array, biases_array, Pre_activations_array, Post_activations_array):
     output = input_data
+    Post_activations_array.append(input_data)  # did this to make indexing easier
 
     for i in range(len(weights_array)):
         Pre_activations_output = np.dot(weights_array[i], output) + biases_array[i]
@@ -90,20 +100,23 @@ def Loss_function(output, actual):
 def Loss_derivative(output, actual):
     return (-actual / output) + ((1 - actual) / (1 - output))
 
-def backpropagation(pre_activations,post_activations, Weights, Biases, Weights_gradients, Biases_gradients, outputs, actuals): # NOTE: Need to finish
-    
-    reusable_math = sigmoid_derivative(pre_activations) * Loss_derivative(outputs, actuals)
+def backpropagation(pre_activations, post_activations, Weights, Biases, Weights_gradients, Biases_gradients, outputs, actuals):
+    # Compute output layer delta
+    delta = sigmoid_derivative(pre_activations[-1]) * Loss_derivative(outputs, actuals)
+    print("\n pre activations: ", pre_activations)
+    print("\n post activations: ", post_activations)
 
-    for i in range(len(Biases)-1, -1, -1):
-        temp_weight_matrix = ((Weights[i] * 0) + 1)
-        temp_bias_matrix = ((Biases[i] * 0) + 1)
-        print("\n Temp matrix: ", temp_weight_matrix)
+    for i in range(len(Weights) - 1, -1, -1):
+        # post_activations[i] is the activation feeding INTO layer i
+        Weights_gradients[i] = np.dot(delta, post_activations[i].T)
+        Biases_gradients[i] = delta
+        print("\n pre_activations[i] in use: ", pre_activations[i])
+        print("\n post_activations[i] in use: ", post_activations[i])
+        print("\n delta in use: ", delta)
 
-        
-
-
-    
-    pass
+        if i > 0:
+            # Propagate delta to the previous layer
+            delta = np.dot(Weights[i].T, delta) * sigmoid_derivative(pre_activations[i - 1])
     
 
 if __name__ == "__main__":
