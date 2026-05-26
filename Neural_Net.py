@@ -1,4 +1,9 @@
 import numpy as np
+import csv
+import tkinter as tk
+from tkinter import filedialog
+import pandas as pd
+
 
 # sqrt(2/n) n is input node amount
 
@@ -18,6 +23,7 @@ def main():
     
     trial_data = np.array([[107, 6.61, 6.28, 8, 0, 8, 8, 4]])
     transposed_data = trial_data.T
+    print(load_data())
     
     feedfoward_output = feedfoward(transposed_data, weights_array, biases_array, Pre_activations_array, Post_activations_array)
     trial_data_output = np.array([0])
@@ -30,6 +36,19 @@ def main():
     gradiant_b =  [0] * len(biases_array)   
     backpropagation(Pre_activations_array, Post_activations_array, weights_array, biases_array, gradiant_w, gradiant_b, feedfoward_output, trial_data_output)
     update_weights_and_biases(weights_array, biases_array, gradiant_w, gradiant_b, Learning_Rate)
+
+def load_data():
+    root = tk.Tk()
+    root.withdraw()
+
+    # Show the 'Open' dialog box and return the selected file path
+    file_name = filedialog.askopenfilename()
+
+    with open(file_name, 'r', newline='') as raw_data:
+        data_list = pd.read_csv(raw_data).to_numpy()
+
+    return data_list
+
     
 
 def update_weights_and_biases(weights_array, biases_array, gradiant_w, gradiant_b, learning_rate):
